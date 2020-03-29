@@ -1,5 +1,4 @@
 #include<stdio.h>
-#include"queue.c"
 
 /*
 p - process
@@ -11,75 +10,216 @@ rnt - remaining time
 pp - priority
 */
 
-
+int n,quantum;
 struct process_times{
-    int p,at,bt,wt,tat,pp,rnt;
+    int pid,p,af,a,fb,b,comp;
 };
 
-void sortstruc(struct process_times b[],int pro){
-struct process_times temp;
-for(int i = 0;i<pro;i++){
-    for(int j=i+1;j<pro;j++)
+
+void sort(struct process_times temp[],int n)
+{  
+	int i=0,j=0,temp1=0;
+	for (i = 0; i < n; ++i) 
     {
-        if(b[i].at > b[j].at)
+        for (j = i + 1; j < n; ++j)
         {
-            temp = b[i];
-            b[i] = b[j];
-            b[j] = temp;
+            if (temp[i].af>temp[j].af) 
+            {
+            	temp1 =  temp[i].comp;
+                temp[i].comp = temp[j].comp;
+                temp[j].comp = temp1;
+                temp1 =  temp[i].a;
+                temp[i].a = temp[j].a;
+                temp[j].a = temp1;
+                temp1 =  temp[i].af;
+                temp[i].af = temp[j].af;
+                temp[j].af = temp1;
+                temp1 =  temp[i].p;
+                temp[i].p = temp[j].p;
+                temp[j].p = temp1;
+                temp1 =  temp[i].pid;
+                temp[i].pid = temp[j].pid;
+                temp[j].pid = temp1; 
+                temp1 =  temp[i].b;
+                temp[i].b = temp[j].b;
+                temp[j].b = temp1; 
+                temp1 =  temp[i].fb;
+                temp[i].fb = temp[j].fb;
+                temp[j].fb = temp1;
+    	    }
+			else if(temp[i].af==temp[j].af)
+			{
+              	if(temp[i].p<temp[j].p)
+				{
+                temp1 =  temp[i].comp;
+                temp[i].comp = temp[j].comp;
+                temp[j].comp = temp1;
+                temp1 =  temp[i].a;
+                temp[i].a = temp[j].a;
+                temp[j].a = temp1;
+                temp1 =  temp[i].p;
+                temp[i].p = temp[j].p;
+                temp[j].p = temp1;
+                temp1 =  temp[i].af;
+                temp[i].af = temp[j].af;
+                temp[j].af = temp1;
+                temp1 =  temp[i].pid;
+                temp[i].pid = temp[j].pid;
+                temp[j].pid = temp1; 
+                temp1 =  temp[i].b;
+                temp[i].b = temp[j].b;
+                temp[j].b = temp1; 
+                temp1 =  temp[i].fb;
+                temp[i].fb = temp[j].fb;
+                temp[j].fb = temp1;	
+				}
+			}
         }
-    }
-}
-return ;
+	}
 }
 
-void gant_chart(struct process_times a[],int pro,int ts){
-    int remain = 0,time = 0,i,;
-    int r_p[pro];
-    remain = pro;
-    sortstruc(a,pro);
-    printf("Gant Chart\n: ");
-    int cpu_time = a[0].at;
-    if(cpu_time != 0){
-        time += cpu_time;
-        printf("0-> [P_IDLE]  <-%d",time);
-        insert(a[0].p);
-    }else{
-        insert(a[0].p)
-    }
-    for(i = 0;remain!=0;){
-        if((a[i].at<=ts && a[i].at>0) && a[i].p == intArray[i])
+
+void sortid(struct process_times temp[],int n)
+{
+	int i=0,j=0,temp1=0;
+	for (i = 0; i < n; ++i) 
+    {
+        for (j = i + 1; j < n; ++j)
         {
-            
-        }
+            if (temp[i].pid>temp[j].pid) 
+            {
+              temp1 =  temp[i].comp;
+                temp[i].comp = temp[j].comp;
+                temp[j].comp = temp1;
+                temp1 =  temp[i].a;
+                temp[i].a = temp[j].a;
+                temp[j].a = temp1;
+                temp1 =  temp[i].af;
+                temp[i].af = temp[j].af;
+                temp[j].af = temp1;
+                temp1 =  temp[i].p;
+                temp[i].p = temp[j].p;
+                temp[j].p = temp1;
+                temp1 =  temp[i].pid;
+                temp[i].pid = temp[j].pid;
+                temp[j].pid = temp1; 
+                temp1 =  temp[i].b;
+                temp[i].b = temp[j].b;
+                temp[j].b = temp1; 
+                temp1 =  temp[i].fb;
+                temp[i].fb = temp[j].fb;
+                temp[j].fb = temp1;	
+            }
+		}
     }
-    
+ 
+}
+
+void main_sol(struct process_times temp[],int n){
+    	int slot,time = 0,cur = 0;
+	for(int i=0;i<n;i++)
+	{
+	
+		if((temp[i].a+temp[i].b < temp[i+1].a)&&(temp[i].pid < n)){
+			slot = slot+1;
+		}
+		if(temp[i].b%quantum==0)
+			slot = slot+temp[i].b/quantum;
+		else
+			slot = slot+(temp[i].b/quantum)+1;
+		printf("%d",slot);
+		
+	}
+	for(int i=0;i<slot;i++)
+	{
+		int k = 0;
+		int flag =0;
+		int ft=time;
+		if(temp[cur].af<=time){
+			if(temp[cur].fb<=quantum)
+			{
+				time=time+temp[cur].fb;
+				temp[cur].af=temp[cur].af+temp[cur].fb;
+				k = temp[cur].fb - quantum;
+				temp[cur].fb=0;
+				temp[cur].p=-100;
+				temp[cur].af=100000;
+				temp[cur].comp=time;
+			}
+			else
+			{
+				temp[cur].fb=temp[cur].fb-quantum;
+				time+=quantum;
+				temp[cur].af=temp[cur].af+quantum;
+			}
+				printf("Process P[%d]Executed From %d to %d\n",temp[cur].pid,ft,time);
+		}
+		else{
+			flag = 1;
+		k  = temp[cur].af - time;
+		time+=k;
+			printf("Process P_IDLE Executed From %d to %d\n",ft,time);
+			
+		}
+		if(flag==0){
+		//	printf(" P[%d] \t\t| %d \t\t| %d \t\t| %d \t\t %d\n",pid[cur],a[i],b[i],p[i],comp[i]);
+		sort(temp,n);
+		
+	//	printf(" P[%d] \t\t| %d \t\t| %d \t\t| %d \t\t %d\n",pid[cur],a[i],b[i],p[i],comp[i]);
+	
+	    printf("\n\n");
+		cur=0;
+		for(int j=1;j<n;j++)
+			if(temp[j].p>temp[cur].p&&temp[j].af<=time)
+					cur = j;
+		
+	
+	}
+	sortid(temp,n);
+    }
+}
+
+void display_question(struct process_times temp[],int n){
+    	printf("\n\n\t\tQuestion :- \n\n");
+	printf(" PROCESS ID \t| ARRIVAL TIME \t| BURST TIME \t| PRIORITY \n");
+	for(int i=0;i<n;i++)
+	{
+		printf(" P[%d] \t\t| %d \t\t| %d \t\t| %d \t\t %d\n",temp[i].pid,temp[i].a,temp[i].b,temp[i].p,temp[i].comp);
+	}
+	printf("\n\n");
+    main_sol(temp,n);
+}
+
+
+void insert(){ 
+    printf("Prioirty Based Round Robin Scheduling\n\n");
+	printf("Enter Time Quantum :- ");
+	scanf("%d",&quantum);
+	printf("Enter Number of Process:- ");
+	scanf("%d",&n);
+    struct process_times temp[n];
+	for(int i=0;i<n;i++){
+		printf("\nEnter Arrval Time of Process %d :- ",i+1);
+		temp[i].pid = i+1;
+		scanf("%d",&temp[i].a);
+		temp[i].af=temp[i].a;
+		printf("Enter Burst Time Of Process %d :- ",i+1);
+		scanf("%d",&temp[i].b);
+		temp[i].fb = temp[i].b;
+		printf("Enter Priority Of Process %d :- ",i+1);
+		scanf("%d",&temp[i].p);	
+	}
+	sort(temp,n);
+   display_question(temp,n);
+}
+
+void display_answer(struct process_times temp[],int n){
 
 }
 
-void display(struct process_times a[],int pro){
-    sortstruc(a,pro);
-printf("\nProcess\tPriority\tArrival_Time\tBurst_time\n");
-    for(int i=0;i<pro;i++)
-       {
-              printf("P%d\t\t%d\t\t%d\t\t%d\t\t\n",a[i].p+1,a[i].at,a[i].bt,a[i].pp);
-       }
-}
+
 
 int main(){
-    int pro,time,ts;
-    printf("\t\t\tPriotity based round robin algorithm\n");
-    printf("Enter the no of process: ");
-    scanf("%d",&pro);
-    struct process_times a[pro];
-    printf("Enter the time quantutm: ");
-    scanf("%d",&ts);
-    for(int i=0;i<pro;i++)
-       {
-              printf("Enter priority, arrival time and Burst time for Process P%d : ",i+1);
-              scanf("%d%d%d",&a[i].pp,&a[i].at,&a[i].bt);
-              a[i].p = i;
-              a[i].rnt = a[i].bt;
-       }
-    main_sol(a,pro,ts);
+    insert();
     return 0;
 }
