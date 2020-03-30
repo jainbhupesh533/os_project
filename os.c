@@ -120,7 +120,7 @@ void sortid(struct process_times temp[],int n)
 }
 
 // function for display final answer with turnaround time, waiting time ,avg_wai,avg_tat and cpu utilization
-void display_answer(struct process_times temp[],int n,int time){
+void display_answer(struct process_times temp[],int n,int time,int nw){
 
 	printf("\n\n\t Final Solution :- \n");
 	float avtat=0,avwt=0;
@@ -129,12 +129,14 @@ void display_answer(struct process_times temp[],int n,int time){
 	{	
 		temp[i].tat = temp[i].comp-temp[i].a;
 		int x = temp[i].comp-(temp[i].a+temp[i].b);
-		printf(" P[%d] \t\t| %d \t\t\t| %d \n",temp[i].pid,temp[i].tat,x);
-		avtat+=temp[i].tat;	
-		avwt+=x;
+		if(temp[i].tat >= 0 && x>=0){
+			printf(" P[%d] \t\t| %d \t\t\t| %d \n",temp[i].pid,temp[i].tat,x);
+			avtat+=temp[i].tat;	
+			avwt+=x;
+		}
 	}
-	// printf("%d %d",temp[n-1].a,time);
-	float cpu_util = ((float)temp[n-1].a/(float)time) * 100;
+	printf("%d %d",nw,time);
+	float cpu_util = ((float)nw/(float)time) * 100;
 	printf("\n\n Average TurnAround Time =  %.2f",avtat/=(n));
 	printf("\n Average Waiting Time =  %.2f",avwt/=(n));
 	printf("\n CPU_UTIL = %0.2f percent \n",cpu_util);
@@ -143,18 +145,20 @@ void display_answer(struct process_times temp[],int n,int time){
 // main sol for gannt chart and executing the process according the algorithm
 
 void main_sol(struct process_times temp[],int n){
-    	int slot = 0,time = 0,cur = 0,nw[10];
+    	int slot = 0,time = 0,cur = 0,nw = 0;
 	for(int i=0;i<n;i++)  //finding slots for run the actual process or distributing the process accoding to time slot
 	{
-		nw[i] += temp[i].b ;
-		if((nw[i] < temp[i+1].a)){
+		nw += temp[i].b ;
+		if(temp[i].pid < n-1 && nw < temp[i+1].a){
 			slot = slot+1;
 		}
-		if(temp[i].b%quantum==0)
+		if(temp[i].b%quantum==0){
 			slot = slot+temp[i].b/quantum;
-		else
+		}
+		else{
 			slot = slot+(temp[i].b/quantum)+1;
-		printf("%d\n",slot);  
+		}
+		// printf("%d\n",slot);  
 	}
 	
 	for(int i=0;i<slot;i++)
@@ -204,7 +208,7 @@ void main_sol(struct process_times temp[],int n){
 	}
     }
 	sortid(temp,n);
-	display_answer(temp,n,time);
+	display_answer(temp,n,time,nw);
 }
 
 void display_question(struct process_times temp[],int n){ // this is what we inputted
@@ -242,8 +246,6 @@ void insert(){  // this is for taking all the values
 	sort(temp,n);
    display_question(temp,n);
 }
-
-
 
 
 int main(){
