@@ -1,21 +1,24 @@
 #include<stdio.h>
 
 /*
-p - process
-at - arrival time
-bt - burst time
-wt - waiting time 
-tat- turnaround time 
-rnt - remaining time  
-pp - priority
+p - priority
+a,af - arrival time
+b,fb - burst time
+x - waiting time 
+tat- turnaround time   
+pid- process id
+comp - completeion time
+n -  no of process
+quantum - quantum time
 */
 
 int n,quantum;
+// using structure for data
 struct process_times{
     int pid,p,af,a,fb,b,comp,tat;
 };
 
-
+//sorting according to the arrival time and priority
 void sort(struct process_times temp[],int n)
 {  
 	int i=0,j=0,temp1=0;
@@ -79,6 +82,7 @@ void sort(struct process_times temp[],int n)
 }
 
 
+//sorting according to process id for final answer
 void sortid(struct process_times temp[],int n)
 {
 	int i=0,j=0,temp1=0;
@@ -115,6 +119,7 @@ void sortid(struct process_times temp[],int n)
  
 }
 
+// function for display final answer with turnaround time, waiting time ,avg_wai,avg_tat and cpu utilization
 void display_answer(struct process_times temp[],int n,int time){
 
 	printf("\n\n\t Final Solution :- \n");
@@ -128,17 +133,18 @@ void display_answer(struct process_times temp[],int n,int time){
 		avtat+=temp[i].tat;	
 		avwt+=x;
 	}
-	printf("%d %d",temp[n-1].a,time);
+	// printf("%d %d",temp[n-1].a,time);
 	float cpu_util = ((float)temp[n-1].a/(float)time) * 100;
 	printf("\n\n Average TurnAround Time =  %.2f",avtat/=(n));
 	printf("\n Average Waiting Time =  %.2f",avwt/=(n));
 	printf("\n CPU_UTIL = %0.2f percent \n",cpu_util);
 }
 
+// main sol for gannt chart and executing the process according the algorithm
 
 void main_sol(struct process_times temp[],int n){
     	int slot = 0,time = 0,cur = 0,nw[10];
-	for(int i=0;i<n;i++)
+	for(int i=0;i<n;i++)  //finding slots for run the actual process or distributing the process accoding to time slot
 	{
 		nw[i] += temp[i].b ;
 		if((nw[i] < temp[i+1].a)){
@@ -148,7 +154,7 @@ void main_sol(struct process_times temp[],int n){
 			slot = slot+temp[i].b/quantum;
 		else
 			slot = slot+(temp[i].b/quantum)+1;
-		printf("%d\n",slot);
+		printf("%d\n",slot);  
 	}
 	
 	for(int i=0;i<slot;i++)
@@ -156,8 +162,8 @@ void main_sol(struct process_times temp[],int n){
 		int k = 0;
 		int flag =0;
 		int ft=time;
-		if(temp[cur].af<=time){
-			if(temp[cur].fb<=quantum)
+		if(temp[cur].af<=time){ // in this we are updating everytime all the value
+			if(temp[cur].fb<=quantum) //running process if it equals or less than time quantum and complets it
 			{
 				time=time+temp[cur].fb;
 				temp[cur].af=temp[cur].af+temp[cur].fb;
@@ -167,7 +173,7 @@ void main_sol(struct process_times temp[],int n){
 				temp[cur].af=100000;
 				temp[cur].comp=time;
 			}
-			else
+			else  //if not equals to that 
 			{
 				temp[cur].fb=temp[cur].fb-quantum;
 				time+=quantum;
@@ -175,14 +181,14 @@ void main_sol(struct process_times temp[],int n){
 			}
 				printf("Process P[%d]Executed From %d to %d\n",temp[cur].pid,ft,time);
 		}
-		else{
+		else{ // if there is ideal case then this case runs and if this runs then values are not updated
 			flag = 1;
 		k  = temp[cur].a - ft;
 		time+=k;
 			printf("Process P_IDLE Executed From %d to %d\n",ft,time);
 			
 		}
-		if(flag==0){
+		if(flag==0){  // if the process completes or having another process in queue ,for checking priority then updating the cur value
 		//	printf(" P[%d] \t\t| %d \t\t| %d \t\t| %d \t\t %d\n",pid[cur],a[i],b[i],p[i],comp[i]);
 		sort(temp,n);
 		
@@ -201,7 +207,7 @@ void main_sol(struct process_times temp[],int n){
 	display_answer(temp,n,time);
 }
 
-void display_question(struct process_times temp[],int n){
+void display_question(struct process_times temp[],int n){ // this is what we inputted
     	printf("\n\n\t\tQuestion :- \n\n");
 	printf(" PROCESS ID \t| ARRIVAL TIME \t| BURST TIME \t| PRIORITY \n");
 	for(int i=0;i<n;i++)
@@ -213,7 +219,7 @@ void display_question(struct process_times temp[],int n){
 }
 
 
-void insert(){ 
+void insert(){  // this is for taking all the values
     printf("Prioirty Based Round Robin Scheduling\n\n");
 	printf("Enter Time Quantum :- ");
 	scanf("%d",&quantum);
