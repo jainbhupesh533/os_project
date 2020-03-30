@@ -112,7 +112,7 @@ void display_answer(){
 		avtat+=tat[i];	
 		avwt+=x;
 	}
-	float cpu_util = a[n]/time;
+	float cpu_util = ((float)a[n-1]/(float)time) * 100;
 	printf("\n\n Average TurnAround Time =  %.2f",avtat/=(n));
 	printf("\n Average Waiting Time =  %.2f",avwt/=(n));
 	printf("\n CPU_UTIL = %0.2f percent",cpu_util);
@@ -134,7 +134,7 @@ void main_sol(){
 		printf("%d",slot);
 		
 	}
-	for(int i=0;i<slot - 1;i++)
+	for(int i=0;i<slot ;i++)
 	{
 		int k = 0;
 		int flag =0;

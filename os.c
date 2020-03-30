@@ -12,7 +12,7 @@ pp - priority
 
 int n,quantum;
 struct process_times{
-    int pid,p,af,a,fb,b,comp;
+    int pid,p,af,a,fb,b,comp,tat;
 };
 
 
@@ -115,21 +115,42 @@ void sortid(struct process_times temp[],int n)
  
 }
 
+void display_answer(struct process_times temp[],int n,int time){
+
+	printf("\n\n\t Final Solution :- \n");
+	float avtat=0,avwt=0;
+	printf(" PROCESS ID \t| TurnAroundTime \t| Waiting Time  \n");
+	for(int i=0;i<n;i++)
+	{	
+		temp[i].tat = temp[i].comp-temp[i].a;
+		int x = temp[i].comp-(temp[i].a+temp[i].b);
+		printf(" P[%d] \t\t| %d \t\t\t| %d \n",temp[i].pid,temp[i].tat,x);
+		avtat+=temp[i].tat;	
+		avwt+=x;
+	}
+	printf("%d %d",temp[n-1].a,time);
+	float cpu_util = ((float)temp[n-1].a/(float)time) * 100;
+	printf("\n\n Average TurnAround Time =  %.2f",avtat/=(n));
+	printf("\n Average Waiting Time =  %.2f",avwt/=(n));
+	printf("\n CPU_UTIL = %0.2f percent \n",cpu_util);
+}
+
+
 void main_sol(struct process_times temp[],int n){
-    	int slot,time = 0,cur = 0;
+    	int slot = 0,time = 0,cur = 0,nw[10];
 	for(int i=0;i<n;i++)
 	{
-	
-		if((temp[i].a+temp[i].b < temp[i+1].a)&&(temp[i].pid < n)){
+		nw[i] += temp[i].b ;
+		if((nw[i] < temp[i+1].a)){
 			slot = slot+1;
 		}
 		if(temp[i].b%quantum==0)
 			slot = slot+temp[i].b/quantum;
 		else
 			slot = slot+(temp[i].b/quantum)+1;
-		printf("%d",slot);
-		
+		printf("%d\n",slot);
 	}
+	
 	for(int i=0;i<slot;i++)
 	{
 		int k = 0;
@@ -156,7 +177,7 @@ void main_sol(struct process_times temp[],int n){
 		}
 		else{
 			flag = 1;
-		k  = temp[cur].af - time;
+		k  = temp[cur].a - ft;
 		time+=k;
 			printf("Process P_IDLE Executed From %d to %d\n",ft,time);
 			
@@ -175,8 +196,9 @@ void main_sol(struct process_times temp[],int n){
 		
 	
 	}
-	sortid(temp,n);
     }
+	sortid(temp,n);
+	display_answer(temp,n,time);
 }
 
 void display_question(struct process_times temp[],int n){
@@ -208,14 +230,13 @@ void insert(){
 		temp[i].fb = temp[i].b;
 		printf("Enter Priority Of Process %d :- ",i+1);
 		scanf("%d",&temp[i].p);	
+		temp[i].comp = 0;
+		temp[i].tat = 0;
 	}
 	sort(temp,n);
    display_question(temp,n);
 }
 
-void display_answer(struct process_times temp[],int n){
-
-}
 
 
 
